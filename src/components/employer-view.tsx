@@ -1,0 +1,20 @@
+import { Link } from '@tanstack/react-router';
+import { ArrowRight, Building2, CheckCircle2, GraduationCap, ShieldCheck, Ticket } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { approveVoucher, getRole, gapIndexes } from '@/lib/skillbridge';
+import { useWorkspace } from './skillbridge-provider';
+
+export function EmployerView() {
+  const { session, login, passports, save } = useWorkspace();
+  const requests = passports.filter(p => p.voucher === 'requested');
+  const approved = passports.filter(p => p.voucher === 'approved');
+  return <main className="workspace"><div className="page-heading"><div><div className="eyebrow"><Building2 size={13}/>EMPLOYER & SPONSOR VIEW</div><h1>Invest in <span className="text-primary">verified potential.</span></h1><p>Meet skilled candidates. Back their growth. Open a door to what’s next.</p></div><span className="heading-label"><ShieldCheck size={14}/>Skills-first opportunities</span></div>
+    {session !== 'employer' ? <div className="employer-login"><section className="login-card"><Building2 size={32} className="text-primary"/><span className="badge-status float-right">Employer / Training Sponsor</span><h2>Back someone’s next chapter.</h2><p>Explore candidate passports and approve requested bridging vouchers as a demo employer or training sponsor.</p><Button onClick={() => login('employer')}>Enter sponsor demo<ArrowRight size={15}/></Button></section><section className="login-card"><GraduationCap size={32} className="text-primary"/><h2>Start with your own skills.</h2><p>Continue as Amina Wanjiku, take a practical assessment, and request support for your next training opportunity.</p><Button variant="outline" asChild onClick={() => login('candidate')}><Link to="/" search={{}}>Enter candidate demo<ArrowRight size={15}/></Link></Button></section></div> : <>
+      <div className="demo-login-strip"><span className="avatar">ES</span><div><strong>Employer & Training Sponsor</strong><p>Your local sponsorship workspace</p></div><span className="badge-status ml-auto"><CheckCircle2 size={12}/>Signed in</span></div>
+      <div className="stats-grid"><div className="stat"><p>Skill passports</p><strong>{passports.length}</strong></div><div className="stat"><p>Vouchers awaiting review</p><strong className="text-warning">{requests.length}</strong></div><div className="stat"><p>Vouchers approved</p><strong className="text-primary">{approved.length}</strong></div></div>
+      <div className="section-title"><h2>Verified candidate passports</h2><span>{passports.length} {passports.length === 1 ? 'credential' : 'credentials'}</span></div>
+      <div className="table-container"><table className="candidate-table"><thead><tr><th>CANDIDATE</th><th>ROLE</th><th>SKILL GAPS</th><th>VOUCHER STATUS</th><th className="text-right">ACTIONS</th></tr></thead><tbody>{passports.map(passport => <tr key={passport.id}><td><div className="table-person"><span className="avatar">AW</span><div><strong>{passport.name}</strong><p>{passport.id}</p></div></div></td><td>{getRole(passport.roleId).name}</td><td>{gapIndexes(passport.scores).length} to bridge</td><td><span className={`badge-status ${passport.voucher === 'requested' ? 'badge-warning' : ''}`}>{passport.voucher === 'approved' ? <CheckCircle2 size={11}/> : <Ticket size={11}/>} {passport.voucher === 'approved' ? 'Voucher Approved' : passport.voucher === 'requested' ? 'Voucher Requested' : 'Not requested'}</span></td><td><div className="table-actions"><Button variant="outline" size="sm" asChild><Link to="/verify/$id" params={{ id: passport.id }}>Passport<ArrowRight size={12}/></Link></Button>{passport.voucher === 'requested' && <Button size="sm" onClick={() => save(approveVoucher(passport))}>Approve Voucher</Button>}</div></td></tr>)}</tbody></table></div>
+      <p className="public-notice"><ShieldCheck size={15}/>Demo approvals are saved in this browser. No payment is made and no training is booked.</p>
+    </>}
+  </main>;
+}

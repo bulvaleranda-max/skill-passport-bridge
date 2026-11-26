@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## App architecture
+- Keep assessment scoring and voucher transitions in pure browser-safe functions so their rules can be tested independently.
+- Share one React workspace provider across candidate, passport, and sponsor views so local changes remain synchronized.
+- Load browser storage only after hydration; use a validated credential payload in share links so locally generated passports can open on another device without a server.
+- Treat credentials and role sessions as demo data, not trusted authentication or accredited verification; the app has no server authority.
